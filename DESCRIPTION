@@ -25,5 +25,6 @@ Suggests:
     fastqcr,
     bib2df,
     devtools,
-    testthat
+    testthat,
+    readr
 VignetteBuilder: knitr

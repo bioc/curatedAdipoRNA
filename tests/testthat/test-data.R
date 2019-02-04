@@ -4,6 +4,7 @@ context("test-data")
 library(SummarizedExperiment)
 library(fastqcr)
 library(bib2df)
+library(readr)
 
 # load object
 data("gene_counts")
