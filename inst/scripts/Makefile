@@ -9,8 +9,7 @@ all: dir_tree \
 	get_annotation \
 	align_reads \
 	count_features \
-	fastqc \
-	make_object
+	fastqc
 
 # make directory tree
 dir_tree:

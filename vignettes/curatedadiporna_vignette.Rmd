@@ -1,0 +1,197 @@
+---
+title: "Using curatedAdipoRNA"
+author: "Mahmoud Ahmed"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Using curatedAdipoRNA}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Overview
+
+In this document, we introduce the purpose of the `curatedAdipoRNA` package, its contents and its potential use cases. This package is a curated dataset of RNA-Seq samples. The samples are MDI-induced pre-adipocytes (3T3-L1) at different time points/stage of differentiation. The package document the data collection, pre-processing and processing. In addition to the documentation, the package contains the scripts that was used to generated the data in `inst/scripts/`, the processed data in `inst/extdata/` and the final `RangedSummarizedExperiment` object in `data/`.
+
+# Introduction
+
+## What is `curatedAdipoRNA`?
+
+It is an R package for documenting and distributing a curated dataset. The package doesn't contain any R functions.
+
+## What is contained in `curatedAdipoRNA`?
+
+The package contains three differnt things:
+
+1. Scripts for documenting/reproducing the data in `inst/scripts`
+2. Pre-processed data in `inst/extdata`
+3. Final `RangedSummarizedExperiment` object in `data/`
+
+## What is `curatedAdipoRNA` for?
+
+The `RangedSummarizedExperiment` object contains the `gene_counts`, `colData`, `rowRanges` and `metadata` which can be used for the purposes of conducting differential expression or gene set enrichment analysis on the cell line model.
+
+# Installation
+
+The source code of the pacakge is hosted on GitHub and can be installed using `devtools`.
+
+```{r install_package,eval=FALSE}
+# install package from github
+devtools::install_github('MahShaaban/curatedAdipoRNA')
+```
+
+# Docker image
+
+The pre-processing and processing of the data setup environment is available as a `docker` image. This image is also suitable for reproducing this document. The `docker` image can be obtained using the `docker` CLI client.
+
+```
+$ docker pull bcmslab/adiporeg_rna:latest
+```
+
+# Generating `curatedAdipoRNA`
+
+## Search strategy & data collection
+
+The term "3T3-L1" was used to search the NCBI **SRA** repository. The results were sent to the **run selector**. 1,176 runs were viewed. The runs were faceted by **Assay Type** and the "rna-seq" which resulted in 323 runs. Only 98 samples from 16 different studies were included after being manually reviewed to fit the following criteria:
+* The raw data is available from GEO and has a GEO identifier (GSM#)
+* The raw data is linked to a published publicly available article
+* The protocols for generating the data sufficiently describe the origin of the cell line, the differentiation medium and the time points when the samples were collected. 
+* In case the experimenal designs included treatment other than the differentiation medias, the control (non-treated) samples were included.
+
+Note: The data quality and the platform discrepencies are not inluded in these criteria
+
+## Pre-processing
+The scripts to download and process the raw data are located in `inst/scripts/` and are glued together to run sequentially by the GNU make file `Makefile`. The following is basically a description of the recipies in the `Makefile` with emphasis on the software versions, options, inputs and outputs.
+
+### 1. Downloading data `download_fastq`
+* Program: `wget` (1.18)
+* Input: `run.csv`, the URLs column
+* Output: `*.fastq.gz`
+* Options: `-N`
+
+### 2. Making a genome index `make_index`
+* Program: `hisat2-build` (2.0.5)
+* Input: URL for mm10 mouse genome fasta files
+* Output: `*.bt2` bowtie2 index for the mouse genome
+* Options: defaults
+
+### 3. Dowinloading annotations `get_annotation`
+* Program: `wget` (1.18)
+* Input: URL for mm10 gene annotation file
+* Output: `annotation.gtf`
+* Options: `-N`
+
+### 4. Aligning reads `align_reads`
+* Program: `hisat2` (2.0.5)
+* Input: `*.fastq.gz` and `mm10/` bowtie2 index for the mouse genome
+* Output: `*.sam`
+* Options: defaults
+
+### 5. Counting features `count_features`
+* Program: `featureCounts` (1.5.1)
+* Input: `*.bam` and the annotation `gtf` file for the mm10 mouse genome.
+* Output: `*.txt`
+* Option: defaults
+
+### Quality assessment `fastqc`
+* Program: `fastqc` (0.11.5)
+* Input: `*.fastq.gz` and `*.sam`
+* Output: `*_fastqc.zip`
+* Option: defaults
+
+## Processing
+
+The aim of this step is to construct a self-contained object with minimal manipulations of the pre-processed data followed by simple normalization step to enable the exploration of the data in the next section. 
+
+### Making Summarized experiment object `make_object`
+
+The required steps to make this object from the pre-processed data are documented in the script and are supposed to be fully reproducible when run through this package. The output is a `RangedSummarizedExperiment` object containing the gene counts and the phenotype and features data and metadata.
+
+The `RangedSummarizedExperiment` contains 
+* The gene counts matrix `gene_counts`
+* The phenotype data `colData`
+* The feature data `rowRanges`
+* The metadata `metadata` which contain two objects `qc` a list of `qc_read` objects of each `fastq` file and a `data.frame` of the studies from which the samples were collected.
+
+### Normalization `normalization`
+
+(Not done yet)
+
+## EDA
+
+In this section, we conduct a simple exploration of the data objects to show the content of the package and how they can be loaded and used.
+
+```{r loading_libraries, message=FALSE}
+# loading required libraries
+library(curatedAdipoRNA)
+library(SummarizedExperiment)
+library(fastqcr)
+library(bib2df)
+```
+
+```{r loading_data}
+# load data
+data("gene_counts")
+
+# print object
+gene_counts
+```
+
+The count matrix can be accessed using `assay`. Here we show the first five entries of the first five samples.
+
+```{r gene_counts}
+# print count matrix
+assay(gene_counts)[1:5, 1:5]
+```
+
+The phenotype/samples data is a `data.frame`, It can be accessed using `colData`. The `time` and `stage` columns encode the time point in hours and stage of differentiation respectively.
+
+```{r colData}
+# names of the coldata object
+names(colData(gene_counts))
+
+# table of times column
+table(colData(gene_counts)$time)
+
+# table of stage column
+table(colData(gene_counts)$stage)
+```
+
+The features data are a `GRanges` object and can be accessed using `rowRanges`.
+
+```{r rowRanges}
+# print GRanges object
+rowRanges(gene_counts)
+```
+
+The metadata is a list of two objects. First is `qc`; a `list` of items that corresond to each `fastq` file. Each item is a `list`/`qc_rea`. The second is `data.frame` containing the metadata of the studies from wich the data were collected. Here we show the first entry in `bib` formate.
+
+```{r metadata, message=FALSE}
+# print class of first sample
+class(metadata(gene_counts)$qc[[1]])
+
+# print data of first study
+df2bib(metadata(gene_counts)$studies[1,])
+```
+
+# Citing `curatedAdipoRNA`
+
+For citing the package use:
+
+```{r citation, warning=FALSE}
+# citing the package
+citation("curatedAdipoRNA")
+```
+
+# Session Info
+
+```{r session_info}
+devtools::session_info()
+```

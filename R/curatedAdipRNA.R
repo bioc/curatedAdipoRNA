@@ -6,15 +6,6 @@
 #' pre-adipocyte cell line. The package document the data collection,
 #' pre-processing and processing of the data.
 #'
-#' @section Processed data and metadata:
-#' \code{samples.csv}
-#' \code{runs.csv}
-#' \code{studies.bib}
-#' \code{gene_body.txt}
-#'
-#' @section Pre-processing and processing scripts
-#' @section Counts and normalized counts object \code{counts.rda}
-#'
 #' @docType package
 #' @name curatedAdipoRNA
 NULL

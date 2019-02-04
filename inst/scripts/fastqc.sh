@@ -15,3 +15,6 @@ for i in $FASTQ; do
       fastq/$i.fastq.gz
   fi
 done
+
+Rscript --default-packages=tidyverse,fastqcr \
+  -e "map(list.files('qc.fastq', '*.zip', full.names = TRUE), qc_read) %>% set_names(str_split(list.files('qc.fastq', '*.zip'), '_fastqc.zip', simplify = TRUE)[, 1]) %>% write_rds('qc.rds')"
