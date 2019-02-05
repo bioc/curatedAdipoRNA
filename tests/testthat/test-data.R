@@ -46,7 +46,7 @@ test_that("rowRanges is formated correcly", {
 
 test_that("metadata is available for all samples", {
   md <- metadata(gene_counts)
-  expect_true(all(str_split(names(md$qc), '_', simplify = TRUE)[, 1] %in% runs$run))
+  expect_true(all(sapply(strsplit(names(md$qc), '_'), `[`, 1) %in% runs$run))
 
   expect_equal(md$studies$BIBTEXKEY, studies$BIBTEXKEY)
   expect_true(all(colData(gene_counts)$bibtexkey %in% md$studies$BIBTEXKEY))
