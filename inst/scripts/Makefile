@@ -1,8 +1,12 @@
 #!/bin/bash
 
+# run scripts in 'inst/scripts' in order
+
+# make variables
 SCRIPTS=scripts
 LOG=log
 
+# run excute all recipies
 all: dir_tree \
 	download_fastq \
 	make_index \

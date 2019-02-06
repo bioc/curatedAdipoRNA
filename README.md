@@ -19,7 +19,7 @@ It is an R package for documenting and distributing a curated dataset. The packa
 
 ## What is contained in `curatedAdipoRNA`?
 
-The package contains three differnt things:
+The package contains three different things:
 
 1. Scripts for documenting/reproducing the data in `inst/scripts`
 2. Pre-processed data in `inst/extdata`
@@ -31,7 +31,7 @@ The `RangedSummarizedExperiment` object contains the `gene_counts`, `colData`, `
 
 # Installation
 
-The source code of the pacakge is hosted on GitHub and can be installed using `devtools`.
+The source code of the package is hosted on GitHub and can be installed using `devtools`.
 
 ```r
 # install package from github

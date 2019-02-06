@@ -28,15 +28,12 @@ pd <- full_join(samples, runs) %>%
 
 rownames(pd) <- pd$id
 
-## make row ranges
+## subset row ranges
 ind <- intersect(row_ranges$gene_id, rownames(mat))
 row_ranges <- row_ranges[match(row_ranges$gene_id, ind)]
 
-## subset matrix to knowngenes
+## subset matrix to known genes
 mat <- mat[row_ranges$gene_id,]
-
-## test objects
-all(rownames(mat) == row_ranges$gene_id)
 
 ## make a SummarizedExperiment object
 gene_counts <- SummarizedExperiment(assays = list(gene_counts = mat),

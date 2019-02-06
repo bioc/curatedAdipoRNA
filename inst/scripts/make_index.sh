@@ -14,9 +14,11 @@
 # since alignments to those sequences are the most useful.  To change
 # which categories are built by this script, edit the CHRS_TO_INDEX
 # variable below.
-#
+
+# make directory for the mm10 files
 test ! -d mm10 && mkdir mm10 || echo 'mm10/ Already exists'
 
+# move to mm10/ directory
 cd mm10
 
 BASE_CHRS="\

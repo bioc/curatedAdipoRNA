@@ -3,7 +3,7 @@
 \docType{data}
 \name{gene_counts}
 \alias{gene_counts}
-\title{A \code{\link[SummarizedExperiment]{RangedSummarizedExperiment}} object}
+\title{Gene counts of differentiating adipocytes}
 \format{A \code{\link[SummarizedExperiment]{SummarizedExperiment}} object
 contains:
 
@@ -20,6 +20,6 @@ the samples were collected.}
 gene_counts
 }
 \description{
-A \code{\link[SummarizedExperiment]{RangedSummarizedExperiment}} object
+Gene counts of differentiating adipocytes
 }
 \keyword{datasets}

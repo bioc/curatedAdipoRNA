@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 
 # Overview
 
-In this document, we introduce the purpose of the `curatedAdipoRNA` package, its contents and its potential use cases. This package is a curated dataset of RNA-Seq samples. The samples are MDI-induced pre-adipocytes (3T3-L1) at different time points/stage of differentiation. The package document the data collection, pre-processing and processing. In addition to the documentation, the package contains the scripts that was used to generated the data in `inst/scripts/`, the processed data in `inst/extdata/` and the final `RangedSummarizedExperiment` object in `data/`.
+In this document, we introduce the purpose of the `curatedAdipoRNA` package, its contents and its potential use cases. This package is a curated dataset of RNA-Seq samples. The samples are MDI-induced pre-phagocytes (3T3-L1) at different time points/stage of differentiation. The package document the data collection, pre-processing and processing. In addition to the documentation, the package contains the scripts that was used to generated the data in `inst/scripts/`, the processed data in `inst/extdata/` and the final `RangedSummarizedExperiment` object in `data/`.
 
 # Introduction
 
@@ -28,7 +28,7 @@ It is an R package for documenting and distributing a curated dataset. The packa
 
 ## What is contained in `curatedAdipoRNA`?
 
-The package contains three differnt things:
+The package contains three different things:
 
 1. Scripts for documenting/reproducing the data in `inst/scripts`
 2. Pre-processed data in `inst/extdata`
@@ -40,7 +40,7 @@ The `RangedSummarizedExperiment` object contains the `gene_counts`, `colData`, `
 
 # Installation
 
-The source code of the pacakge is hosted on GitHub and can be installed using `devtools`.
+The source code of the package is hosted on GitHub and can be installed using `devtools`.
 
 ```{r install_package,eval=FALSE}
 # install package from github
@@ -63,12 +63,12 @@ The term "3T3-L1" was used to search the NCBI **SRA** repository. The results we
 * The raw data is available from GEO and has a GEO identifier (GSM#)
 * The raw data is linked to a published publicly available article
 * The protocols for generating the data sufficiently describe the origin of the cell line, the differentiation medium and the time points when the samples were collected. 
-* In case the experimenal designs included treatment other than the differentiation medias, the control (non-treated) samples were included.
+* In case the experimental designs included treatment other than the differentiation medias, the control (non-treated) samples were included.
 
-Note: The data quality and the platform discrepencies are not inluded in these criteria
+Note: The data quality and the platform discrepancies are not included in these criteria
 
 ## Pre-processing
-The scripts to download and process the raw data are located in `inst/scripts/` and are glued together to run sequentially by the GNU make file `Makefile`. The following is basically a description of the recipies in the `Makefile` with emphasis on the software versions, options, inputs and outputs.
+The scripts to download and process the raw data are located in `inst/scripts/` and are glued together to run sequentially by the GNU make file `Makefile`. The following is basically a description of the recipes in the `Makefile` with emphasis on the software versions, options, inputs and outputs.
 
 ### 1. Downloading data `download_fastq`
 * Program: `wget` (1.18)
@@ -108,7 +108,7 @@ The scripts to download and process the raw data are located in `inst/scripts/` 
 
 ## Processing
 
-The aim of this step is to construct a self-contained object with minimal manipulations of the pre-processed data followed by simple normalization step to enable the exploration of the data in the next section. 
+The aim of this step is to construct a self-contained object with minimal manipulations of the pre-processed data followed by simple a simple exploration of the data in the next section. 
 
 ### Making Summarized experiment object `make_object`
 
@@ -120,11 +120,7 @@ The `RangedSummarizedExperiment` contains
 * The feature data `rowRanges`
 * The metadata `metadata` which contain two objects `qc` a list of `qc_read` objects of each `fastq` file and a `data.frame` of the studies from which the samples were collected.
 
-### Normalization `normalization`
-
-(Not done yet)
-
-## EDA
+## Exploring the `gene_counts` object
 
 In this section, we conduct a simple exploration of the data objects to show the content of the package and how they can be loaded and used.
 
@@ -171,7 +167,7 @@ The features data are a `GRanges` object and can be accessed using `rowRanges`.
 rowRanges(gene_counts)
 ```
 
-The metadata is a list of two objects. First is `qc`; a `list` of items that corresond to each `fastq` file. Each item is a `list`/`qc_rea`. The second is `data.frame` containing the metadata of the studies from wich the data were collected. Here we show the first entry in `bib` formate.
+The metadata is a list of two objects. First is `qc`; a `list` of items that correspond to each `fastq` file. Each item is a `list`/`qc_rea`. The second is `data.frame` containing the metadata of the studies from which the data were collected. Here we show the first entry in `bib` format.
 
 ```{r metadata, message=FALSE}
 # print class of first sample

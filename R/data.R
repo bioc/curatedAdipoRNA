@@ -1,4 +1,4 @@
-#' A \code{\link[SummarizedExperiment]{RangedSummarizedExperiment}} object
+#' Gene counts of differentiating adipocytes
 #'
 #' @format A \code{\link[SummarizedExperiment]{SummarizedExperiment}} object
 #' contains:
