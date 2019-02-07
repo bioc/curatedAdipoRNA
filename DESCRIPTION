@@ -2,7 +2,7 @@ Package: curatedAdipoRNA
 Type: Package
 Title: A Curated RNA-Seq Dataset of MDI-induced Differentiated Adipocytes 
   (3T3-L1)
-Version: 0.99.0
+Version: 0.99.1
 Year: 2019
 Description: A curated dataset of publicly available RNA-sequencing of the 
   3T3-L1 pre-adipocyte cell line. The package document the data collection,
@@ -27,4 +27,7 @@ Suggests:
     testthat,
     readr
 VignetteBuilder: knitr
-biocViews: ExperimentData
+biocViews: ExperimentData,
+    GEO,
+    RNASeqData,
+    SequencingData

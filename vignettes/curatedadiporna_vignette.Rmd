@@ -4,27 +4,35 @@ author: "Mahmoud Ahmed"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Using curatedAdipoRNA}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+    %\VignetteIndexEntry{Using curatedAdipoRNA}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
+    collapse = TRUE,
+    comment = "#>"
 )
 ```
 
 # Overview
 
-In this document, we introduce the purpose of the `curatedAdipoRNA` package, its contents and its potential use cases. This package is a curated dataset of RNA-Seq samples. The samples are MDI-induced pre-phagocytes (3T3-L1) at different time points/stage of differentiation. The package document the data collection, pre-processing and processing. In addition to the documentation, the package contains the scripts that was used to generated the data in `inst/scripts/`, the processed data in `inst/extdata/` and the final `RangedSummarizedExperiment` object in `data/`.
+In this document, we introduce the purpose of the `curatedAdipoRNA` package, 
+its contents and its potential use cases. This package is a curated dataset of
+RNA-Seq samples. The samples are MDI-induced pre-phagocytes (3T3-L1) at 
+different time points/stage of differentiation. The package document the data 
+collection, pre-processing and processing. In addition to the documentation, 
+the package contains the scripts that was used to generated the data in 
+`inst/scripts/`, the processed data in `inst/extdata/` and the final 
+`RangedSummarizedExperiment` object in `data/`.
 
 # Introduction
 
 ## What is `curatedAdipoRNA`?
 
-It is an R package for documenting and distributing a curated dataset. The package doesn't contain any R functions.
+It is an R package for documenting and distributing a curated dataset. The 
+package doesn't contain any R functions.
 
 ## What is contained in `curatedAdipoRNA`?
 
@@ -36,11 +44,14 @@ The package contains three different things:
 
 ## What is `curatedAdipoRNA` for?
 
-The `RangedSummarizedExperiment` object contains the `gene_counts`, `colData`, `rowRanges` and `metadata` which can be used for the purposes of conducting differential expression or gene set enrichment analysis on the cell line model.
+The `RangedSummarizedExperiment` object contains the `gene_counts`, `colData`,
+`rowRanges` and `metadata` which can be used for the purposes of conducting 
+differential expression or gene set enrichment analysis on the cell line model.
 
 # Installation
 
-The source code of the package is hosted on GitHub and can be installed using `devtools`.
+The source code of the package is hosted on GitHub and can be installed using 
+`devtools`.
 
 ```{r install_package,eval=FALSE}
 # install package from github
@@ -49,7 +60,9 @@ devtools::install_github('MahShaaban/curatedAdipoRNA')
 
 # Docker image
 
-The pre-processing and processing of the data setup environment is available as a `docker` image. This image is also suitable for reproducing this document. The `docker` image can be obtained using the `docker` CLI client.
+The pre-processing and processing of the data setup environment is available as
+a `docker` image. This image is also suitable for reproducing this document. 
+The `docker` image can be obtained using the `docker` CLI client.
 
 ```
 $ docker pull bcmslab/adiporeg_rna:latest
@@ -59,16 +72,28 @@ $ docker pull bcmslab/adiporeg_rna:latest
 
 ## Search strategy & data collection
 
-The term "3T3-L1" was used to search the NCBI **SRA** repository. The results were sent to the **run selector**. 1,176 runs were viewed. The runs were faceted by **Assay Type** and the "rna-seq" which resulted in 323 runs. Only 98 samples from 16 different studies were included after being manually reviewed to fit the following criteria:
+The term "3T3-L1" was used to search the NCBI **SRA** repository. The results 
+were sent to the **run selector**. 1,176 runs were viewed. The runs were 
+faceted by **Assay Type** and the "rna-seq" which resulted in 323 runs. Only 98
+samples from 16 different studies were included after being manually reviewed 
+to fit the following criteria:
 * The raw data is available from GEO and has a GEO identifier (GSM#)
 * The raw data is linked to a published publicly available article
-* The protocols for generating the data sufficiently describe the origin of the cell line, the differentiation medium and the time points when the samples were collected. 
-* In case the experimental designs included treatment other than the differentiation medias, the control (non-treated) samples were included.
+* The protocols for generating the data sufficiently describe the origin of the
+cell line, the differentiation medium and the time points when the samples were
+collected. 
+* In case the experimental designs included treatment other than the 
+differentiation medias, the control (non-treated) samples were included.
 
-Note: The data quality and the platform discrepancies are not included in these criteria
+Note: The data quality and the platform discrepancies are not included in these
+criteria.
 
 ## Pre-processing
-The scripts to download and process the raw data are located in `inst/scripts/` and are glued together to run sequentially by the GNU make file `Makefile`. The following is basically a description of the recipes in the `Makefile` with emphasis on the software versions, options, inputs and outputs.
+
+The scripts to download and process the raw data are located in `inst/scripts/`
+and are glued together to run sequentially by the GNU make file `Makefile`. The
+following is basically a description of the recipes in the `Makefile` with 
+emphasis on the software versions, options, inputs and outputs.
 
 ### 1. Downloading data `download_fastq`
 * Program: `wget` (1.18)
@@ -108,21 +133,29 @@ The scripts to download and process the raw data are located in `inst/scripts/` 
 
 ## Processing
 
-The aim of this step is to construct a self-contained object with minimal manipulations of the pre-processed data followed by simple a simple exploration of the data in the next section. 
+The aim of this step is to construct a self-contained object with minimal 
+manipulations of the pre-processed data followed by simple a simple exploration
+of the data in the next section. 
 
 ### Making Summarized experiment object `make_object`
 
-The required steps to make this object from the pre-processed data are documented in the script and are supposed to be fully reproducible when run through this package. The output is a `RangedSummarizedExperiment` object containing the gene counts and the phenotype and features data and metadata.
+The required steps to make this object from the pre-processed data are 
+documented in the script and are supposed to be fully reproducible when run 
+through this package. The output is a `RangedSummarizedExperiment` object 
+containing the gene counts and the phenotype and features data and metadata.
 
 The `RangedSummarizedExperiment` contains 
 * The gene counts matrix `gene_counts`
 * The phenotype data `colData`
 * The feature data `rowRanges`
-* The metadata `metadata` which contain two objects `qc` a list of `qc_read` objects of each `fastq` file and a `data.frame` of the studies from which the samples were collected.
+* The metadata `metadata` which contain two objects `qc` a list of `qc_read` 
+objects of each `fastq` file and a `data.frame` of the studies from which the
+samples were collected.
 
 ## Exploring the `gene_counts` object
 
-In this section, we conduct a simple exploration of the data objects to show the content of the package and how they can be loaded and used.
+In this section, we conduct a simple exploration of the data objects to show 
+the content of the package and how they can be loaded and used.
 
 ```{r loading_libraries, message=FALSE}
 # loading required libraries
@@ -140,14 +173,17 @@ data("gene_counts")
 gene_counts
 ```
 
-The count matrix can be accessed using `assay`. Here we show the first five entries of the first five samples.
+The count matrix can be accessed using `assay`. Here we show the first five 
+entries of the first five samples.
 
 ```{r gene_counts}
 # print count matrix
 assay(gene_counts)[1:5, 1:5]
 ```
 
-The phenotype/samples data is a `data.frame`, It can be accessed using `colData`. The `time` and `stage` columns encode the time point in hours and stage of differentiation respectively.
+The phenotype/samples data is a `data.frame`, It can be accessed using 
+`colData`. The `time` and `stage` columns encode the time point in hours and
+stage of differentiation respectively.
 
 ```{r colData}
 # names of the coldata object
@@ -167,7 +203,10 @@ The features data are a `GRanges` object and can be accessed using `rowRanges`.
 rowRanges(gene_counts)
 ```
 
-The metadata is a list of two objects. First is `qc`; a `list` of items that correspond to each `fastq` file. Each item is a `list`/`qc_rea`. The second is `data.frame` containing the metadata of the studies from which the data were collected. Here we show the first entry in `bib` format.
+The metadata is a list of two objects. First is `qc`; a `list` of items that 
+correspond to each `fastq` file. Each item is a `list`/`qc_rea`. The second is
+`data.frame` containing the metadata of the studies from which the data were 
+collected. Here we show the first entry in `bib` format.
 
 ```{r metadata, message=FALSE}
 # print class of first sample

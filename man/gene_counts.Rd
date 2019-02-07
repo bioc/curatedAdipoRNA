@@ -4,11 +4,11 @@
 \name{gene_counts}
 \alias{gene_counts}
 \title{Gene counts of differentiating adipocytes}
-\format{A \code{\link[SummarizedExperiment]{SummarizedExperiment}} object
+\format{A \code{RangedSummarizedExperiment} object
 contains:
 
 \describe{
-\item{gene_counts}{The gene counts \code{matrix}.}
+\item{assay}{The gene counts \code{matrix}.}
 \item{colData}{The phenotype data.}
 \item{rowRanges}{The feature data}
 \item{metadata}{The metadata \code{metadata} which contain two objects;
@@ -21,5 +21,15 @@ gene_counts
 }
 \description{
 Gene counts of differentiating adipocytes
+}
+\examples{
+# load the package
+library(curatedAdipoRNA)
+
+# load the data object
+data('gene_counts')
+
+# print the object
+gene_counts
 }
 \keyword{datasets}
