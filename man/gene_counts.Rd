@@ -23,9 +23,6 @@ gene_counts
 Gene counts of differentiating adipocytes
 }
 \examples{
-# load the package
-library(curatedAdipoRNA)
-
 # load the data object
 data('gene_counts')
 

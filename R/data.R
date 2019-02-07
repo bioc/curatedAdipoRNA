@@ -14,9 +14,6 @@
 #' }
 #'
 #' @examples
-#' # load the package
-#' library(curatedAdipoRNA)
-#'
 #' # load the data object
 #' data('gene_counts')
 #'
