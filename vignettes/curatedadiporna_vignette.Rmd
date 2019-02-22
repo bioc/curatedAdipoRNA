@@ -24,8 +24,7 @@ RNA-Seq samples. The samples are MDI-induced pre-phagocytes (3T3-L1) at
 different time points/stage of differentiation. The package document the data 
 collection, pre-processing and processing. In addition to the documentation, 
 the package contains the scripts that was used to generated the data in 
-`inst/scripts/`, the processed data in `inst/extdata/` and the final 
-`RangedSummarizedExperiment` object in `data/`.
+`inst/scripts/` and the final `RangedSummarizedExperiment` object in `data/`.
 
 # Introduction
 
@@ -36,11 +35,10 @@ package doesn't contain any R functions.
 
 ## What is contained in `curatedAdipoRNA`?
 
-The package contains three different things:
+The package contains two different things:
 
 1. Scripts for documenting/reproducing the data in `inst/scripts`
-2. Pre-processed data in `inst/extdata`
-3. Final `RangedSummarizedExperiment` object in `data/`
+2. Final `RangedSummarizedExperiment` object in `data/`
 
 ## What is `curatedAdipoRNA` for?
 
@@ -154,7 +152,7 @@ through this package. The output is a `RangedSummarizedExperiment` object
 containing the gene counts and the phenotype and features data and metadata.
 
 The `RangedSummarizedExperiment` contains 
-* The gene counts matrix `adipo_counts`
+* The gene counts matrix `gene_counts`
 * The phenotype data `colData`
 * The feature data `rowRanges`
 * The metadata `metadata` which contain two objects `qc` a list of `qc_read` 
