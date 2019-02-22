@@ -1,6 +1,7 @@
 # load required libraries
 library(tidyverse)
 library(SummarizedExperiment)
+library(S4Vectors)
 library(bib2df)
 library(usethis)
 
@@ -35,12 +36,17 @@ row_ranges <- row_ranges[match(row_ranges$gene_id, ind)]
 ## subset matrix to known genes
 mat <- mat[row_ranges$gene_id,]
 
+## edit studies data.frame
+studies$FILE <- NA
+
 ## make a SummarizedExperiment object
-adipo_counts <- SummarizedExperiment(assays = list(gene_counts = mat),
-                                     colData = pd,
-                                     rowRanges = row_ranges,
-                                     metadata = list(studies = studies,
-                                                     qc = qc))
+adipo_counts <- SummarizedExperiment(
+  assays = list(gene_counts = mat),
+  colData = pd,
+  rowRanges = row_ranges,
+  metadata = list(studies = studies,
+                  qc = SimpleList(qc))
+)
 
 # save object to data/
 use_data(adipo_counts, overwrite = TRUE)
