@@ -1,5 +1,4 @@
 ^inst/extdata$
-^NAMESPACE$
 ^tests$
 ^appveyor\.yml$
 ^\.travis\.yml$
