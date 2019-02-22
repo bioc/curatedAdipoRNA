@@ -36,11 +36,11 @@ row_ranges <- row_ranges[match(row_ranges$gene_id, ind)]
 mat <- mat[row_ranges$gene_id,]
 
 ## make a SummarizedExperiment object
-gene_counts <- SummarizedExperiment(assays = list(gene_counts = mat),
-                                    colData = pd,
-                                    rowRanges = row_ranges,
-                                    metadata = list(studies = studies,
-                                                    qc = qc))
+adipo_counts <- SummarizedExperiment(assays = list(gene_counts = mat),
+                                     colData = pd,
+                                     rowRanges = row_ranges,
+                                     metadata = list(studies = studies,
+                                                     qc = qc))
 
 # save object to data/
-use_data(gene_counts, overwrite = TRUE)
+use_data(adipo_counts, overwrite = TRUE)

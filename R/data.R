@@ -1,4 +1,4 @@
-#' Gene counts of differentiating adipocytes
+#' Gene counts in differentiating adipocytes
 #'
 #' @format A \code{RangedSummarizedExperiment} object
 #' contains:
@@ -15,8 +15,8 @@
 #'
 #' @examples
 #' # load the data object
-#' data('gene_counts')
+#' data('adipo_counts')
 #'
 #' # print the object
-#' gene_counts
-"gene_counts"
+#' adipo_counts
+"adipo_counts"

@@ -44,14 +44,23 @@ The package contains three different things:
 
 ## What is `curatedAdipoRNA` for?
 
-The `RangedSummarizedExperiment` object contains the `gene_counts`, `colData`,
+The `RangedSummarizedExperiment` object contains the `adipo_counts`, `colData`,
 `rowRanges` and `metadata` which can be used for the purposes of conducting 
 differential expression or gene set enrichment analysis on the cell line model.
 
 # Installation
 
-The source code of the package is hosted on GitHub and can be installed using 
-`devtools`.
+The `curatedAdipoRNA` package can be installed from Bioconductor using 
+`BiocManager`.
+
+```{r install_biocmanager,eval=FALSE}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("curatedAdipoRNA")
+```
+
+The source code of the package is also hosted on GitHub and can be installed 
+using `devtools`.
 
 ```{r install_package,eval=FALSE}
 # install package from github
@@ -145,14 +154,14 @@ through this package. The output is a `RangedSummarizedExperiment` object
 containing the gene counts and the phenotype and features data and metadata.
 
 The `RangedSummarizedExperiment` contains 
-* The gene counts matrix `gene_counts`
+* The gene counts matrix `adipo_counts`
 * The phenotype data `colData`
 * The feature data `rowRanges`
 * The metadata `metadata` which contain two objects `qc` a list of `qc_read` 
 objects of each `fastq` file and a `data.frame` of the studies from which the
 samples were collected.
 
-## Exploring the `gene_counts` object
+## Exploring the `adipo_counts` object
 
 In this section, we conduct a simple exploration of the data objects to show 
 the content of the package and how they can be loaded and used.
@@ -167,18 +176,18 @@ library(bib2df)
 
 ```{r loading_data}
 # load data
-data("gene_counts")
+data("adipo_counts")
 
 # print object
-gene_counts
+adipo_counts
 ```
 
 The count matrix can be accessed using `assay`. Here we show the first five 
 entries of the first five samples.
 
-```{r gene_counts}
+```{r adipo_counts}
 # print count matrix
-assay(gene_counts)[1:5, 1:5]
+assay(adipo_counts)[1:5, 1:5]
 ```
 
 The phenotype/samples data is a `data.frame`, It can be accessed using 
@@ -187,20 +196,20 @@ stage of differentiation respectively.
 
 ```{r colData}
 # names of the coldata object
-names(colData(gene_counts))
+names(colData(adipo_counts))
 
 # table of times column
-table(colData(gene_counts)$time)
+table(colData(adipo_counts)$time)
 
 # table of stage column
-table(colData(gene_counts)$stage)
+table(colData(adipo_counts)$stage)
 ```
 
 The features data are a `GRanges` object and can be accessed using `rowRanges`.
 
 ```{r rowRanges}
 # print GRanges object
-rowRanges(gene_counts)
+rowRanges(adipo_counts)
 ```
 
 The metadata is a list of two objects. First is `qc`; a `list` of items that 
@@ -210,10 +219,10 @@ collected. Here we show the first entry in `bib` format.
 
 ```{r metadata, message=FALSE}
 # print class of first sample
-class(metadata(gene_counts)$qc[[1]])
+class(metadata(adipo_counts)$qc[[1]])
 
 # print data of first study
-df2bib(metadata(gene_counts)$studies[1,])
+df2bib(metadata(adipo_counts)$studies[1,])
 ```
 
 # Citing `curatedAdipoRNA`

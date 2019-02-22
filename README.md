@@ -27,7 +27,7 @@ The package contains three different things:
 
 ## What is `curatedAdipoRNA` for?
 
-The `RangedSummarizedExperiment` object contains the `gene_counts`, `colData`, `rowRanges` and `metadata` which can be used for the purposes of conducting differential expression or gene set enrichment analysis on the cell line model.
+The `RangedSummarizedExperiment` object contains the `adipo_counts`, `colData`, `rowRanges` and `metadata` which can be used for the purposes of conducting differential expression or gene set enrichment analysis on the cell line model.
 
 # Installation
 

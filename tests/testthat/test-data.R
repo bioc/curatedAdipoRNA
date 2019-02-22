@@ -7,7 +7,7 @@ library(bib2df)
 library(readr)
 
 # load object
-data("gene_counts")
+data("adipo_counts")
 
 # load pre-processed data
 count <- read_tsv(system.file('extdata', 'gene_body.txt', package = 'curatedAdipoRNA'), skip = 1, n_max = 10)
@@ -18,11 +18,11 @@ studies <- bib2df(system.file('extdata', 'studies.bib', package = 'curatedAdipoR
 qc <- read_rds(system.file('extdata', 'qc.rds', package = 'curatedAdipoRNA'))
 
 test_that("object has the correct class", {
-  expect_s4_class(gene_counts, 'RangedSummarizedExperiment')
+  expect_s4_class(adipo_counts, 'RangedSummarizedExperiment')
 })
 
 test_that("the count matrix has the correct format", {
-  mat <- assay(gene_counts)
+  mat <- assay(adipo_counts)
 
   expect_true(is.matrix(mat))
   expect_equal(ncol(mat), sum(grepl('GSM*', colnames(count))))
@@ -31,7 +31,7 @@ test_that("the count matrix has the correct format", {
 })
 
 test_that("colData has essential sample data", {
-  cd <- colData(gene_counts)
+  cd <- colData(adipo_counts)
 
   expect_true(all(cd$time %in% samples$time))
   expect_true(all(cd$stage %in% samples$stage))
@@ -39,15 +39,15 @@ test_that("colData has essential sample data", {
 })
 
 test_that("rowRanges is formated correcly", {
-  rr <- rowRanges(gene_counts)
+  rr <- rowRanges(adipo_counts)
   expect_true(all(rr$gene_id %in% row_ranges$gene_id))
   expect_equal(sum(duplicated(rr$gene_id)), 0)
 })
 
 test_that("metadata is available for all samples", {
-  md <- metadata(gene_counts)
+  md <- metadata(adipo_counts)
   expect_true(all(sapply(strsplit(names(md$qc), '_'), `[`, 1) %in% runs$run))
 
   expect_equal(md$studies$BIBTEXKEY, studies$BIBTEXKEY)
-  expect_true(all(colData(gene_counts)$bibtexkey %in% md$studies$BIBTEXKEY))
+  expect_true(all(colData(adipo_counts)$bibtexkey %in% md$studies$BIBTEXKEY))
 })
