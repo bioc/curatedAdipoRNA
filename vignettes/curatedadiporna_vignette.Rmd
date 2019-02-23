@@ -170,6 +170,10 @@ library(curatedAdipoRNA)
 library(SummarizedExperiment)
 library(fastqcr)
 library(bib2df)
+library(DESeq2)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
 ```
 
 ```{r loading_data}
@@ -211,7 +215,7 @@ rowRanges(adipo_counts)
 ```
 
 The metadata is a list of two objects. First is `qc`; a `list` of items that 
-correspond to each `fastq` file. Each item is a `list`/`qc_rea`. The second is
+correspond to each `fastq` file. Each item is a `list`/`qc_read`. The second is
 `data.frame` containing the metadata of the studies from which the data were 
 collected. Here we show the first entry in `bib` format.
 
@@ -221,6 +225,193 @@ class(metadata(adipo_counts)$qc[[1]])
 
 # print data of first study
 df2bib(metadata(adipo_counts)$studies[1,])
+```
+
+# Example of using `curatedAdipoRNA`
+
+## Motivation
+
+All the samples in this dataset come from the [3T3-L1](https://en.wikipedia.org/wiki/3T3-L1) cell line. The
+[MDI](http://www.protocol-online.org/prot/Protocols/In-Vitro-Adipocytes-Differentiation-4789.html) 
+induction media, were used to induce adipocyte differentiation. The two 
+important variables in the dataset are `time` and `stage`, which correspond to 
+the time point and stage of differentiation when the sample were captured. 
+Ideally, this dataset should be treated as a time course. However, for the 
+purposes of this example, we only used samples from two time points 0 and 24 
+hours and treated them as independent groups. The goal of this example is to 
+show how a typical differential expression analysis can be applied in the 
+dataset. The main focus is to explain how the the data and metadata in
+`adipo_counts` fit in each main piece of the analysis. We started by filtering
+the low quality samples and low count genes. Then we applied the `DESeq2` 
+method with the default values. 
+
+## Filtering low quality samples
+
+First, we subset the `adipo_counts` object to all samples that has time points 
+0 or 24. The total number of samples is 30; 22 at 0 hour and 8 samples at 24 
+hours. The total number of features/genes in the set is 23916.
+
+```{r subset_object}
+# subsetting counts to 0 and 24 hours
+se <- adipo_counts[, adipo_counts$time %in% c(0, 24)]
+
+# showing the numbers of features, samples and time groups
+dim(se)
+table(se$time)
+```
+
+Since the quality metrics are reported per run file, we need to get the SSR* id
+for each of the samples. Notice that, some samples would have more than one 
+file. In this case because some of the samples are paired-end, so each of them would have two files `SRR\*_1` and `SRR\*_2`. This kind of information is 
+available in `colData`. Next, we subset the `qc` object of the metadata with 
+the identified run ids. 
+
+```{r filtering_samples}
+# filtering low quality samples
+# chek the library layout
+table(se$library_layout)
+
+# get runs ids
+single_runs <- se$run[se$library_layout == 'SINGLE']
+paired_runs <- paste(se$run[se$library_layout == 'PAIRED'], 1:2, sep = '_')
+length(c(single_runs, paired_runs))
+
+# get qc data for each run
+qc <- metadata(se)$qc
+qc <- qc[c(single_runs, paired_runs)]
+
+# check all runs has qc
+all(c(single_runs, paired_runs) %in% names(qc))
+```
+
+The `qc` object of the metadata contains the output of [fastqc](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) 
+in a `qc_read` class. More information on this object can be accessed by 
+calling `?fastqcr::qc_read`. Here, we only use the `per_base_sequence_quality`
+to filter out low quality samples. This is by no means enough quality control 
+but it should drive the point home.
+
+```{r per_base_scores}
+# extracting per_base_sequence_quality
+per_base <- lapply(as.list(qc), function(x) {
+  df <- x[['per_base_sequence_quality']]
+  df %>%
+    select(Base, Mean) %>%
+    transform(Base = strsplit(as.character(Base), '-')) %>%
+    unnest(Base) %>%
+    mutate(Base = as.numeric(Base))
+}) %>%
+  bind_rows(.id = 'run')
+```
+
+After tidying the data, we get a `data.frame` with three columns; `run`, `Mean`
+and `Base` for the run ID, the mean quality score and the base number in each 
+read. [fastqc](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) 
+provide thorough documentation of this quality control module and others. 
+Notice that read length varies significantly between the runs and that the 
+average of the mean score is suitable. 
+
+```{r score_summary}
+# a quick look at quality scores
+summary(per_base)
+```
+
+To identify the low quality samples, we categorize the runs by `length` and
+`run_average` which are the read length and the average of the per base mean
+scores. The following figure should make it easier to see why these cutoff were
+used in this case.
+
+```{r finding_low_scores,fig.align='centre',fig.height=3,fig.width=7}
+# find low quality runs
+per_base <- per_base %>%
+  group_by(run) %>%
+  mutate(length = max(Base) > 150,
+         run_average = mean(Mean) > 34)
+
+# plot average per base quality
+per_base %>%
+  ggplot(aes(x = Base, y = Mean, group = run, color = run_average)) +
+  geom_line() +
+  facet_wrap(~length, scales = 'free_x')
+```
+
+The run IDs of the "bad" samples is then used to remove them form the dataset.
+
+```{r remove_lowscore}
+# get run ids of low quality samples
+bad_samples <- unique(per_base$run[per_base$run_average == FALSE])
+
+# subset the counts object
+se2 <- se[, !se$run %in% bad_samples]
+table(se2$time)
+```
+
+## Filtering low count genes
+
+To identify the low count feature/genes (possible not expressed), we keep only the
+features with at least 10 reads in 2 or more samples. Then we subset the object to
+exclude these genes.
+
+```{r remove low_counts}
+# filtering low count genes
+low_counts <- apply(assay(se2), 1, function(x) length(x[x>10])>=2)
+table(low_counts)
+
+# subsetting the count object
+se3 <- se2[low_counts,]
+```
+
+## Applying differential expression using `DESeq2`
+
+[DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html) is a 
+well documented and widely used R package for the differential expression 
+analysis. Here we use the default values of `DESeq` to find the genes which are
+deferentially expressed between the samples at 24 hours and 0 hours. 
+
+```{r differential expression}
+# differential expression analysis
+se3$time <- factor(se3$time)
+dds <- DESeqDataSet(se3, ~time)
+dds <- DESeq(dds)
+res <- results(dds)
+table(res$padj < .1)
+```
+
+## Next!
+
+In this example, we didn't attempt to correct for the between study factors 
+that might confound the results. To show how is this possible, we use the
+[PCA](https://en.wikipedia.org/wiki/Principal_component_analysis) plots with a 
+few of these factors in the following graphs. The first uses the `time` factor
+which is the factor of interest in this case. We see that the `DESeq`
+transformation did a good job separating the samples to their expected groups.
+However, it also seems that the `time` is not the only factor in play. For 
+example, we show in the second and the third graphs two other factors
+`library_layout` and `instrument_model` which might explain some of the 
+variance between the samples. This is expected because the data were collected 
+from different studies using slightly different protocols and different 
+sequencing machines. Therefore, it is necessary to account for these 
+differences to obtain reliable results. There are multiple methods to do that 
+such as [Removing Unwanted Variation (RUV)](http://www-personal.umich.edu/~johanngb/ruv/) 
+and [Surrogate Variable Analysis (SVA)](http://bioconductor.org/packages/release/bioc/html/sva.html).
+
+
+```{r pca,fig.align='centre',fig.height=4,fig.width=4}
+# explaining variabce 
+plotPCA(rlog(dds), intgroup = 'time')
+plotPCA(rlog(dds), intgroup = 'library_layout')
+plotPCA(rlog(dds), intgroup = 'instrument_model')
+```
+
+## Citting the studies in this subset of the data
+
+Speaking of studies, as mentioned earlier the `studies` object contains full
+information of the references of the original studies in which the data were
+published. Please cite them when using this dataset.
+
+```{r studies_keys}
+# keys of the studies in this subset of the data
+studies <- metadata(se3)$studies
+studies$BIBTEXKEY[studies$BIBTEXKEY %in% se3$bibtexkey]
 ```
 
 # Citing `curatedAdipoRNA`
