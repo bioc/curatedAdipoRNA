@@ -292,7 +292,7 @@ but it should drive the point home.
 
 ```{r per_base_scores}
 # extracting per_base_sequence_quality
-per_base <- lapply(as.list(qc), function(x) {
+per_base <- BiocGenerics::lapply(qc, function(x) {
   df <- x[['per_base_sequence_quality']]
   df %>%
     select(Base, Mean) %>%
@@ -334,7 +334,7 @@ per_base %>%
   facet_wrap(~length, scales = 'free_x')
 ```
 
-The run IDs of the "bad" samples is then used to remove them form the dataset.
+The run IDs of the "bad" samples is then used to remove them from the dataset.
 
 ```{r remove_lowscore}
 # get run ids of low quality samples
@@ -402,7 +402,7 @@ plotPCA(rlog(dds), intgroup = 'library_layout')
 plotPCA(rlog(dds), intgroup = 'instrument_model')
 ```
 
-## Citting the studies in this subset of the data
+## Citing the studies in this subset of the data
 
 Speaking of studies, as mentioned earlier the `studies` object contains full
 information of the references of the original studies in which the data were
