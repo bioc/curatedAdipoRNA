@@ -57,14 +57,6 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 BiocManager::install("curatedAdipoRNA")
 ```
 
-The source code of the package is also hosted on GitHub and can be installed 
-using `devtools`.
-
-```{r install_package,eval=FALSE}
-# install package from github
-devtools::install_github('MahShaaban/curatedAdipoRNA')
-```
-
 # Docker image
 
 The pre-processing and processing of the data setup environment is available as
@@ -168,6 +160,7 @@ the content of the package and how they can be loaded and used.
 # loading required libraries
 library(curatedAdipoRNA)
 library(SummarizedExperiment)
+library(S4Vectors)
 library(fastqcr)
 library(bib2df)
 library(DESeq2)
@@ -194,7 +187,7 @@ assay(adipo_counts)[1:5, 1:5]
 
 The phenotype/samples data is a `data.frame`, It can be accessed using 
 `colData`. The `time` and `stage` columns encode the time point in hours and
-stage of differentiation respectively.
+stage of differentiation respectively. 
 
 ```{r colData}
 # names of the coldata object
@@ -206,6 +199,31 @@ table(colData(adipo_counts)$time)
 # table of stage column
 table(colData(adipo_counts)$stage)
 ```
+
+Other columns in `colData` are selected information about the samples/runs or
+identifiers to different databases. The following table provides the 
+description of each of these columns.
+
+| col_name         | description                                                                                                                                                             |
+|------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| id               | The GEO sample identifier.                                                                                                                                              |
+| study            | The SRA study identifier.                                                                                                                                               |
+| pmid             | The PubMed ID of the article where the data were published originally.                                                                                                  |
+| time             | The time point of the sample when collected in hours. The time is recorded from the beginning of the protocol as 0 hours.                                               |
+| stage            | The stage of differentiation of the sample when collected. Possible values are 0 to 3; 0 for non-differentiated; 1 for differentiating; and 2/3 for maturating samples. |
+| bibtexkey        | The key of the study where the data were published originally. This maps to the studies object of the metadata which records the study information in bibtex format.    |
+| run              | The SRA run identifier.                                                                                                                                                 |
+| submission       | The SRA study submission identifier.                                                                                                                                    |
+| sample           | The SRA sample identifier.                                                                                                                                              |
+| experiment       | The SRA experiment identifier.                                                                                                                                          |
+| study_name       | The GEO study/series identifier.                                                                                                                                        |
+| library_layout   | The type of RNA library. Possible values are SINGLE for single-end and PAIRED for paired-end runs.                                                                      |
+| instrument_model | The name of the sequencing machine that was used to obtain the sequence reads.                                                                                          |
+
+Useing the identifiers in `colData` along with Bioconductor packages such as
+[`GEOmetabd`](http://bioconductor.org/packages/GEOmetadb/) and/or
+[`SRAdb`](http://bioconductor.org/packages/SRAdb/) gives access to the sample
+metadata as submitted by the authors or recored in the data repositories.
 
 The features data are a `GRanges` object and can be accessed using `rowRanges`.
 
@@ -292,7 +310,7 @@ but it should drive the point home.
 
 ```{r per_base_scores}
 # extracting per_base_sequence_quality
-per_base <- BiocGenerics::lapply(qc, function(x) {
+per_base <- lapply(qc, function(x) {
   df <- x[['per_base_sequence_quality']]
   df %>%
     select(Base, Mean) %>%

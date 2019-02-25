@@ -46,14 +46,6 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 BiocManager::install("curatedAdipoRNA")
 ```
 
-The source code of the package is also hosted on GitHub and can be installed 
-using `devtools`.
-
-```{r install_package,eval=FALSE}
-# install package from github
-devtools::install_github('MahShaaban/curatedAdipoRNA')
-```
-
 # Docker image
 
 The pre-processing and processing of the data setup environment is available as
