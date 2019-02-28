@@ -39,13 +39,24 @@ mat <- mat[row_ranges$gene_id,]
 ## edit studies data.frame
 studies$FILE <- NA
 
+## add qc to colData
+df <- data.frame(
+  qc_name = names(qc),
+  stringsAsFactors = FALSE
+) %>%
+  mutate(run = str_split(qc_name, '_', simplify = TRUE)[, 1]) %>%
+  right_join(dplyr::select(as.data.frame(colData(adipo_counts)), id, run))
+
+ids <- split(df$qc_name, df$id)
+
+adipo_counts$qc <- List(lapply(ids, function(x) qc[x]))
+
 ## make a SummarizedExperiment object
 adipo_counts <- SummarizedExperiment(
   assays = list(gene_counts = mat),
   colData = pd,
   rowRanges = row_ranges,
-  metadata = list(studies = studies,
-                  qc = SimpleList(qc))
+  metadata = list(studies = studies)
 )
 
 # save object to data/
