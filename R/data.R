@@ -5,12 +5,11 @@
 #'
 #' \describe{
 #' \item{assay}{The gene counts \code{matrix}.}
-#' \item{colData}{The phenotype data.}
-#' \item{rowRanges}{The feature data}
-#' \item{metadata}{The metadata \code{metadata} which contain two objects;
-#' \code{qc} A \code{list} of \code{\link[fastqcr]{qc_read}} objects of
-#' each \code{fastq} file and a \code{data.frame} of the studies from which
-#' the samples were collected.}
+#' \item{colData}{The phenotype data and quality control data of the samples.}
+#' \item{rowRanges}{The feature data at gene level.}
+#' \item{metadata}{The study level metadata which contains one object called
+#' \code{studies}. This is a \code{data.frame} of bibliography information of
+#' the studies from which the samples were collected.}
 #' }
 #'
 #' @examples
