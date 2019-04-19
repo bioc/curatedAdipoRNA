@@ -161,7 +161,6 @@ library(curatedAdipoRNA)
 library(SummarizedExperiment)
 library(S4Vectors)
 library(fastqcr)
-library(bib2df)
 library(DESeq2)
 library(dplyr)
 library(tidyr)
@@ -248,11 +247,11 @@ class(adipo_counts$qc[[1]][[1]])
 
 The metadata is a list of one object. `studies` is a `data.frame` containing
 the bibliography information of the studies from which the data were collected.
-Here we show the first entry in `bib` format.
+Here we show the first entry in `studies`.
 
 ```{r metadata, message=FALSE}
 # print data of first study
-df2bib(metadata(adipo_counts)$studies[1,])
+metadata(adipo_counts)$studies[1,]
 ```
 
 # Summary of the studies in the dataset
