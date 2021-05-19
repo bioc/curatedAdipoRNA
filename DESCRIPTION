@@ -2,7 +2,7 @@ Package: curatedAdipoRNA
 Type: Package
 Title: A Curated RNA-Seq Dataset of MDI-induced Differentiated Adipocytes 
   (3T3-L1)
-Version: 1.8.0
+Version: 1.9.0
 Year: 2019
 Description: A curated dataset of RNA-Seq samples. The samples are MDI-induced
   pre-phagocytes (3T3-L1) at different time points/stage of differentiation. 
